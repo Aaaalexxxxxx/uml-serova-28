@@ -1,0 +1,63 @@
+@startuml
+!include ../../_style.puml
+
+left to right direction
+skinparam packageStyle rectangle
+
+' --- Актёры ---
+actor "Клиент"   as client
+actor "Водитель" as driver
+actor "Диспетчер" as dispatcher
+actor "Платёжный шлюз" as pay <<system>>
+actor "Картографический сервис" as maps <<system>>
+
+' --- Границы системы ---
+rectangle "Служба такси" {
+
+    ' --- Первичные ВИ ---
+    usecase "Заказать поездку"        as UC_order
+    usecase "Отменить поездку"        as UC_cancel
+    usecase "Оценить водителя"        as UC_rate_driver
+    usecase "Принять заказ"           as UC_accept
+    usecase "Завершить поездку"       as UC_finish
+    usecase "Оценить клиента"         as UC_rate_client
+
+    ' --- Вторичные ВИ ---
+    usecase "Рассчитать цену"         as UC_price
+    usecase "Подобрать водителя"      as UC_match
+    usecase "Разрешить спор"          as UC_dispute
+
+    ' --- Общий ВИ для include ---
+    usecase "Проверить\nстатус клиента" as UC_verify
+}
+
+' --- Связи актёров ---
+client     -- UC_order
+client     -- UC_cancel
+client     -- UC_rate_driver
+
+driver     -- UC_accept
+driver     -- UC_finish
+driver     -- UC_rate_client
+
+dispatcher -- UC_dispute
+
+' --- Обобщение актёров (generalization) ---
+' Водитель и Диспетчер — частные случаи Пользователя системы
+actor "Пользователь\nсистемы" as user
+driver     --|> user
+dispatcher --|> user
+
+' --- Include (обязательные шаги) ---
+UC_order  ..> UC_verify : <<include>>
+UC_accept ..> UC_verify : <<include>>
+
+' --- Extend (опциональное поведение) ---
+UC_price  ..> UC_order  : <<extend>>\n[динамическое\nценообразование]
+UC_match  ..> UC_order  : <<extend>>\n[есть свободные\nводители]
+
+' --- Внешние системы ---
+UC_price -- pay  : <<system>>
+UC_match -- maps : <<system>>
+
+@enduml
