@@ -1,0 +1,137 @@
+' ============================================================
+' _style.puml — общий стиль для всех диаграмм PlantUML
+' ============================================================
+
+' --- Общие настройки ---
+skinparam dpi 150
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 12
+skinparam defaultTextAlignment center
+
+' --- Цвета (единая палитра) ---
+!define PRIMARY_COLOR       #2A5298
+!define SECONDARY_COLOR     #81C784
+!define ACCENT_COLOR        #4FC3F7
+!define BACKGROUND_COLOR    #F0F4F8
+!define TEXT_COLOR          #333333
+!define BORDER_COLOR        #666666
+!define WARNING_COLOR       #FFB74D
+!define DANGER_COLOR        #E57373
+
+' --- Последовательные диаграммы (sequence) ---
+skinparam sequence {
+    ArrowColor          PRIMARY_COLOR
+    ActorBorderColor    PRIMARY_COLOR
+    ActorBackgroundColor BACKGROUND_COLOR
+    ActorFontColor      TEXT_COLOR
+    LifeLineBorderColor PRIMARY_COLOR
+    ParticipantBorderColor PRIMARY_COLOR
+    ParticipantBackgroundColor BACKGROUND_COLOR
+    ParticipantFontColor TEXT_COLOR
+    NoteBackgroundColor #FFF9C4
+    NoteBorderColor     WARNING_COLOR
+}
+
+' --- Диаграммы классов (class) ---
+skinparam class {
+    BackgroundColor     BACKGROUND_COLOR
+    BorderColor         PRIMARY_COLOR
+    ArrowColor          PRIMARY_COLOR
+    FontColor           TEXT_COLOR
+    AttributeFontColor  TEXT_COLOR
+    AttributeFontSize   11
+    ClassFontSize       13
+    ClassFontStyle      bold
+}
+
+' --- Диаграммы деятельности (activity) ---
+skinparam activity {
+    BackgroundColor     BACKGROUND_COLOR
+    BorderColor         PRIMARY_COLOR
+    ArrowColor          PRIMARY_COLOR
+    FontColor           TEXT_COLOR
+    DiamondBackgroundColor #FFF9C4
+    DiamondBorderColor  WARNING_COLOR
+    StartColor          SECONDARY_COLOR
+    EndColor            DANGER_COLOR
+}
+
+' --- Диаграммы компонентов (component) ---
+skinparam component {
+    BackgroundColor     BACKGROUND_COLOR
+    BorderColor         PRIMARY_COLOR
+    ArrowColor          PRIMARY_COLOR
+    FontColor           TEXT_COLOR
+    InterfaceBackgroundColor ACCENT_COLOR
+    InterfaceBorderColor PRIMARY_COLOR
+}
+
+' --- Диаграммы развёртывания (deployment) ---
+skinparam node {
+    BackgroundColor     BACKGROUND_COLOR
+    BorderColor         PRIMARY_COLOR
+    FontColor           TEXT_COLOR
+}
+skinparam database {
+    BackgroundColor     BACKGROUND_COLOR
+    BorderColor         PRIMARY_COLOR
+    FontColor           TEXT_COLOR
+}
+skinparam cloud {
+    BackgroundColor     BACKGROUND_COLOR
+    BorderColor         ACCENT_COLOR
+    FontColor           TEXT_COLOR
+}
+
+' --- Use Case диаграммы ---
+skinparam usecase {
+    BackgroundColor     BACKGROUND_COLOR
+    BorderColor         PRIMARY_COLOR
+    ArrowColor          PRIMARY_COLOR
+    ActorBorderColor    PRIMARY_COLOR
+    ActorBackgroundColor BACKGROUND_COLOR
+}
+
+' --- Комментарии / заметки ---
+skinparam note {
+    BackgroundColor     #FFF9C4
+    BorderColor         WARNING_COLOR
+    FontColor           TEXT_COLOR
+}
+
+' --- Границы (boundary) и пакеты ---
+skinparam package {
+    BackgroundColor     transparent
+    BorderColor         BORDER_COLOR
+    FontColor           TEXT_COLOR
+    FontStyle           bold
+}
+skinparam rectangle {
+    BackgroundColor     BACKGROUND_COLOR
+    BorderColor         PRIMARY_COLOR
+}
+
+' --- Заголовки и подписи ---
+skinparam title {
+    FontSize            16
+    FontStyle           bold
+    FontColor           PRIMARY_COLOR
+}
+skinparam caption {
+    FontSize            11
+    FontColor           BORDER_COLOR
+}
+
+' --- Участники (participant) для sequence ---
+skinparam participant {
+    BackgroundColor     BACKGROUND_COLOR
+    BorderColor         PRIMARY_COLOR
+    FontColor           TEXT_COLOR
+    FontStyle           bold
+}
+skinparam actor {
+    BackgroundColor     BACKGROUND_COLOR
+    BorderColor         PRIMARY_COLOR
+    FontColor           TEXT_COLOR
+}
