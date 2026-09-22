@@ -1,0 +1,49 @@
+@startuml Draft_Domain
+!include ../../_style.puml
+
+skinparam classAttributeIconSize 0
+
+class Клиент {
+    + id : UUID
+    + имя : String
+    + телефон : String
+    + рейтинг : Float
+}
+
+class Водитель {
+    + id : UUID
+    + имя : String
+    + авто : String
+    + рейтинг : Float
+    + статус : Enum
+}
+
+class Поездка {
+    + id : UUID
+    + адрес_откуда : String
+    + адрес_куда : String
+    + цена : Decimal
+    + статус : Enum
+    + время_создания : DateTime
+}
+
+class Отзыв {
+    + id : UUID
+    + оценка : Int
+    + комментарий : String
+    + дата : DateTime
+}
+
+class Тариф {
+    + id : UUID
+    + название : String
+    + базовая_цена : Decimal
+    + коэффициент : Float
+}
+
+Клиент "1" -- "0..*" Поездка : создаёт >
+Водитель "1" -- "0..*" Поездка : выполняет >
+Поездка "1" -- "0..2" Отзыв : получает >
+Тариф "1" -- "0..*" Поездка : применяется >
+
+@enduml

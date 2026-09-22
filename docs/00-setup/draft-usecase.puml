@@ -1,0 +1,29 @@
+@startuml Draft_UseCase
+!include ../../_style.puml
+
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Клиент" as Client
+actor "Водитель" as Driver
+actor "Диспетчер" as Dispatcher
+
+rectangle "Служба такси" {
+    usecase "Заказать поездку"   as UC1
+    usecase "Отменить поездку"   as UC2
+    usecase "Оценить водителя"   as UC3
+    usecase "Принять заказ"      as UC4
+    usecase "Оценить клиента"    as UC5
+    usecase "Разрешить спор"     as UC6
+}
+
+Client     --> UC1
+Client     --> UC2
+Client     --> UC3
+
+Driver     --> UC4
+Driver     --> UC5
+
+Dispatcher --> UC6
+
+@enduml
