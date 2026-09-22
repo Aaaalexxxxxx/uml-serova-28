@@ -1,0 +1,17 @@
+@startuml Draft_Sequence
+!include ../../_style.puml
+
+actor Клиент
+participant "Мобильное\nприложение" as App
+participant "Сервер\nзаказов" as Server
+participant "Сервис\nподбора" as Match
+actor Водитель
+
+Клиент -> App : Указать адреса
+App -> Server : Создать заказ
+Server -> Match : Найти водителяd
+Match --> Server : Водитель найден
+Server -> Водитель : Предложить заказ
+Водитель --> Server : Принять заказ
+
+@enduml

@@ -1,0 +1,87 @@
+#SCHEME1
+@startuml Taxi_UseCase
+!include _style.puml
+
+left to right direction
+
+actor "Клиент" as client
+actor "Водитель" as driver
+actor "Система\nценообразования" as pricing
+
+rectangle "Служба такси" {
+    usecase "Заказать поездку" as UC1
+    usecase "Подбор водителя" as UC2
+    usecase "Расчёт цены" as UC3
+    usecase "Отменить поездку" as UC4
+    usecase "Оценить водителя" as UC5
+    usecase "Оценить клиента" as UC6
+}
+
+client --> UC1
+client --> UC4
+client --> UC5
+
+driver --> UC6
+
+UC1 ..> UC2 : <<include>>
+UC1 ..> UC3 : <<include>>
+UC2 ..> pricing : <<use>>
+
+@enduml
+
+
+
+#SCHEME2
+@startuml Taxi_Sequence
+!include _style.puml
+
+actor Клиент
+participant "Мобильное\nприложение" as App
+participant "Сервер\nзаказов" as Order
+participant "Сервис\nподбора" as Match
+participant "Сервис\nцен" as Price
+actor Водитель
+
+Клиент -> App : Указать адреса
+App -> Order : Создать заказ
+
+Order -> Price : Рассчитать стоимость
+Price --> Order : Стоимость
+
+Order -> Match : Найти водителя
+Match --> Order : Найден водитель
+
+Order -> Водитель : Предложить заказ
+Водитель -> Order : Принять
+
+Order -> App : Заказ принят
+App -> Клиент : Водитель назначен
+@enduml
+
+
+
+#SCHEME3
+@startuml Taxi_Cancel
+!include _style.puml
+
+start
+
+:Клиент нажимает «Отменить»;
+
+if (Водитель уже назначен?) then (да)
+    if (Водитель уже в пути?) then (да)
+        :Списать плату за отмену;
+    else (нет)
+        :Отмена без штрафа;
+    endif
+    :Уведомить водителя;
+else (нет)
+    :Отмена без штрафа;
+endif
+
+:Обновить статус заказа;
+:Записать в историю;
+
+stop
+
+@enduml
