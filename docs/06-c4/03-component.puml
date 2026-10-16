@@ -1,0 +1,56 @@
+@startuml
+!include <C4/C4_Component>
+
+title Уровень 3 — Components: Backend API службы такси
+
+Container(mobile, "Мобильное приложение", "Kotlin / Swift")
+Container(web, "Веб-панель диспетчера", "React")
+
+Container_Boundary(api, "Backend API") {
+    Component(orderCtrl, "OrderController", "Spring MVC", "REST-эндпоинты заказов: создать, отменить, подтвердить")
+    Component(rideCtrl, "RideController", "Spring MVC", "REST-эндпоинты поездок: старт, завершение, статус")
+    Component(ratingCtrl, "RatingController", "Spring MVC", "REST-эндпоинты отзывов и оценок")
+
+    Component(orderSvc, "OrderService", "Kotlin", "Жизненный цикл заказа: создание, подтверждение, отмена, возврат")
+    Component(matchSvc, "MatchService", "Kotlin", "Подбор водителя: радиус, рейтинг, приоритет")
+    Component(priceSvc, "PriceService", "Kotlin", "Расчёт стоимости по тарифу и коэффициенту спроса")
+    Component(ratingSvc, "RatingService", "Kotlin", "Обработка отзывов и пересчёт рейтинга")
+    Component(eventPub, "EventPublisher", "Kotlin", "Публикация доменных событий в очередь")
+
+    Component(orderRepo, "OrderRepository", "Spring Data JPA", "Доступ к заказам, поездкам, предложениям")
+    Component(userRepo, "UserRepository", "Spring Data JPA", "Доступ к клиентам, водителям, отзывам")
+}
+
+Container(matcher, "Сервис подбора водителей", "Kotlin")
+Container(pricer, "Сервис ценообразования", "Kotlin")
+ContainerDb(db, "Основная БД", "PostgreSQL")
+ContainerQueue(bus, "Очередь событий", "RabbitMQ")
+System_Ext(pay, "Платёжный шлюз")
+System_Ext(maps, "Картографический сервис")
+
+Rel(mobile, orderCtrl, "POST /orders", "JSON/HTTPS")
+Rel(mobile, rideCtrl, "GET /rides/{id}", "JSON/HTTPS")
+Rel(web, orderCtrl, "GET /orders", "JSON/HTTPS")
+Rel(web, ratingCtrl, "GET /ratings", "JSON/HTTPS")
+
+Rel(orderCtrl, orderSvc, "вызывает")
+Rel(rideCtrl, orderSvc, "вызывает")
+Rel(ratingCtrl, ratingSvc, "вызывает")
+
+Rel(orderSvc, matchSvc, "передаёт заказ на подбор")
+Rel(orderSvc, priceSvc, "запрашивает стоимость")
+Rel(orderSvc, orderRepo, "использует")
+Rel(orderSvc, eventPub, "публикует OrderCreated")
+Rel(matchSvc, matcher, "вызывает", "JSON/HTTPS")
+Rel(priceSvc, pricer, "вызывает", "JSON/HTTPS")
+Rel(ratingSvc, userRepo, "использует")
+
+Rel(orderRepo, db, "читает и пишет", "JDBC")
+Rel(userRepo, db, "читает и пишет", "JDBC")
+Rel(eventPub, bus, "публикует события", "AMQP")
+Rel(orderSvc, pay, "проводит оплату", "HTTPS")
+Rel(matchSvc, maps, "запрашивает маршрут", "HTTPS")
+
+SHOW_LEGEND()
+
+@enduml
