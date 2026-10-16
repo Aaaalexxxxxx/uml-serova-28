@@ -1,0 +1,56 @@
+@startuml
+!include ../../_style.puml
+
+title Диаграмма развёртывания (UML): Служба такси
+
+node "Устройство клиента" {
+    artifact "Мобильное приложение" as mobileApp
+}
+
+node "Рабочее место диспетчера" {
+    artifact "Веб-панель диспетчера" as webApp
+}
+
+node "Kubernetes-кластер" as k8s {
+    node "Pod: api (x3)" as podApi {
+        artifact "taxi-api.jar" as apiJar
+    }
+    node "Pod: matcher (x2)" as podMatcher {
+        artifact "taxi-matcher.jar" as matcherJar
+    }
+    node "Pod: pricer (x2)" as podPricer {
+        artifact "taxi-pricer.jar" as pricerJar
+    }
+    node "Pod: worker (x1)" as podWorker {
+        artifact "taxi-worker.jar" as workerJar
+    }
+}
+
+node "Сервер БД" as dbNode {
+    database "PostgreSQL 16" as pg
+}
+
+node "Брокер сообщений" as mqNode {
+    queue "RabbitMQ 3.13" as rabbit
+}
+
+cloud "Внешние сервисы" {
+    node "Платёжный шлюз" as payExt
+    node "Картографический сервис" as mapsExt
+}
+
+mobileApp ..> apiJar : HTTPS/443
+webApp ..> apiJar : HTTPS/443
+
+apiJar ..> pg : JDBC/5432
+apiJar ..> rabbit : AMQP/5672
+apiJar ..> payExt : HTTPS/443
+apiJar ..> mapsExt : HTTPS/443
+
+matcherJar ..> pg : JDBC/5432
+matcherJar ..> rabbit : AMQP/5672
+pricerJar ..> pg : JDBC/5432
+workerJar ..> pg : JDBC/5432
+workerJar ..> rabbit : AMQP/5672
+
+@enduml
