@@ -8,7 +8,7 @@ participant "МобильноеПриложение" as ui
 participant "RideService" as svc
 participant "ТарифнаяПолитика" as policy
 participant "DriverService" as drv
-database "БД"
+database "БД" as db
 
 client -> ui : указать(точкаА, точкаБ, класс)
 activate ui
@@ -29,14 +29,14 @@ db --> svc : список водителей
 deactivate db
 
 opt водители найдены
-svc -> drv : назначитьВодителя(заказ, список)
-activate drv
-drv -> db : INSERT ride
-activate db
-db --> drv : id поездки
-deactivate db
-drv --> svc : Водитель
-deactivate drv
+    svc -> drv : назначитьВодителя(заказ, список)
+    activate drv
+    drv -> db : INSERT ride
+    activate db
+    db --> drv : id поездки
+    deactivate db
+    drv --> svc : Водитель
+    deactivate drv
 end
 
 svc --> ui : Поездка
