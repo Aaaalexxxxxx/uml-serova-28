@@ -1,0 +1,27 @@
+@startuml
+!include ../../_style.puml
+
+title ВИ-01 «Заказать поездку»: диаграмма коммуникации
+
+object "<u>:Клиент</u>" as client
+object "<u>ui : МобильноеПриложение</u>" as ui
+object "<u>svc : RideService</u>" as svc
+object "<u>policy : ТарифнаяПолитика</u>" as policy
+object "<u>drv : DriverService</u>" as drv
+object "<u>db : БД</u>" as db
+
+client -- ui : 1: указать(точкаА, точкаБ, класс)
+ui -- svc : 2: рассчитатьПоездку(точкаА, точкаБ, класс)
+svc -- policy : 2.1: тарифДля(класс)
+policy -- svc : 2.2: Тариф
+svc -- svc : 2.3: рассчитатьСтоимость(маршрут, тариф)
+svc -- db : 2.4: SELECT доступные водители
+db -- svc : 2.5: список водителей
+svc -- drv : 2.6: назначитьВодителя(заказ, список)
+drv -- db : 2.6.1: INSERT ride
+db -- drv : 2.6.2: id поездки
+drv -- svc : 2.6.3: Водитель
+svc -- ui : 3: Поездка
+ui -- client : 4: стоимость и время подачи
+
+@enduml
