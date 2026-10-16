@@ -1,0 +1,48 @@
+@startuml
+!include <C4/C4_Container>
+
+title Уровень 2 — Containers: Служба такси
+
+Person(client, "Клиент")
+Person(driver, "Водитель")
+Person(dispatcher, "Диспетчер")
+
+System_Boundary(taxi, "Служба такси") {
+    Container(mobile, "Мобильное приложение", "Kotlin / Swift", "Заказ поездки, оплата, оценка водителя")
+    Container(web, "Веб-панель диспетчера", "React", "Просмотр активных заказов, разрешение споров")
+    Container(api, "Backend API", "Kotlin / Spring Boot", "Бизнес-логика: заказы, тарифы, водители, отзывы")
+    Container(matcher, "Сервис подбора водителей", "Kotlin", "Поиск ближайшего свободного водителя, рейтинг, приоритет")
+    Container(pricer, "Сервис ценообразования", "Kotlin", "Расчёт стоимости с учётом тарифа и коэффициента спроса")
+    Container(worker, "Планировщик", "Kotlin", "Таймауты, напоминания, начисление штрафов")
+    ContainerDb(db, "Основная БД", "PostgreSQL", "Заказы, поездки, пользователи, тарифы, отзывы, транзакции")
+    ContainerQueue(bus, "Очередь событий", "RabbitMQ", "Доменные события: заказ создан, водитель назначен, поездка завершена")
+}
+
+System_Ext(pay, "Платёжный шлюз")
+System_Ext(maps, "Картографический сервис")
+
+Rel(client, mobile, "Пользуется", "HTTPS")
+Rel(driver, mobile, "Пользуется", "HTTPS")
+Rel(dispatcher, web, "Пользуется", "HTTPS")
+
+Rel(mobile, api, "Вызывает", "JSON/HTTPS")
+Rel(web, api, "Вызывает", "JSON/HTTPS")
+
+Rel(api, matcher, "Передаёт заказ на подбор", "JSON/HTTPS")
+Rel(api, pricer, "Запрашивает стоимость", "JSON/HTTPS")
+Rel(api, db, "Читает и пишет", "JDBC")
+Rel(api, bus, "Публикует события", "AMQP")
+Rel(api, pay, "Проводит оплату", "HTTPS")
+Rel(api, maps, "Запрашивает маршрут", "HTTPS")
+
+Rel(matcher, db, "Читает статусы водителей", "JDBC")
+Rel(matcher, bus, "Публикует DriverAssigned", "AMQP")
+Rel(pricer, db, "Читает тарифы", "JDBC")
+Rel(bus, worker, "Доставляет события", "AMQP")
+Rel(worker, db, "Обновляет статусы", "JDBC")
+Rel(worker, mobile, "Отправляет Push-уведомления", "HTTPS")
+
+SHOW_LEGEND()
+
+@enduml
+
