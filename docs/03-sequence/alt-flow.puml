@@ -1,0 +1,66 @@
+@startuml
+!include ../../_style.puml
+
+title ВИ-01 «Заказать поездку»: исключения
+
+actor "Клиент" as client
+participant "МобильноеПриложение" as ui
+participant "RideService" as svc
+participant "ТарифнаяПолитика" as policy
+participant "DriverService" as drv
+database "БД" as db
+queue "Очередь событий" as bus
+
+client -> ui : указать(точкаА, точкаБ, класс)
+activate ui
+
+ui -> svc : рассчитатьПоездку(точкаА, точкаБ, класс)
+activate svc
+
+svc -> policy : тарифДля(класс)
+activate policy
+policy --> svc : Тариф
+deactivate policy
+
+svc -> svc : рассчитатьСтоимость(маршрут, тариф)
+
+alt клиент заблокирован или имеет долг
+    svc --> ui : отказ: причина блокировки
+    ui --> client : показать причину, предложить поддержку
+else клиент отказался от заказа
+    svc --> ui : отмена: заказ не создан
+    ui --> client : подтверждение отмены
+else свободных водителей нет
+    svc --> ui : отказ: водители не найдены
+    ui --> client : предложить подождать или отменить
+else заказ возможен
+    svc -> db : SELECT доступные водители
+    activate db
+    db --> svc : список водителей
+    deactivate db
+
+    opt водители найдены
+        svc -> drv : назначитьВодителя(заказ, список)
+        activate drv
+        drv -> db : INSERT ride
+        activate db
+        db --> drv : id поездки
+        deactivate db
+        drv --> svc : Водитель
+        deactivate drv
+    end
+
+    loop каждые 30 секунд
+        svc -> drv : проверитьСтатусВодителя()
+        drv --> svc : статус
+    end
+
+    svc ->> bus : RideCreated
+    svc --> ui : Поездка создана
+    ui --> client : стоимость и время подачи
+end
+
+deactivate svc
+deactivate ui
+
+@enduml
