@@ -1,0 +1,36 @@
+@startuml
+!include <C4/C4_Dynamic>
+
+title Динамический вид C4: сценарий «Заказать поездку»
+
+Person(client, "Клиент", "Заказывает поездку")
+
+Container(mobile, "Мобильное приложение", "Kotlin / Swift", "Заказ поездки")
+Container(api, "Backend API", "Kotlin / Spring Boot", "Бизнес-логика заказов")
+Container(pricer, "Сервис ценообразования", "Kotlin", "Расчёт стоимости")
+Container(matcher, "Сервис подбора водителей", "Kotlin", "Поиск водителя")
+ContainerDb(db, "Основная БД", "PostgreSQL", "Заказы, поездки, водители")
+ContainerQueue(bus, "Очередь событий", "RabbitMQ", "Доменные события")
+Container(worker, "Планировщик", "Kotlin", "Таймауты и уведомления")
+
+System_Ext(maps, "Картографический сервис", "Координаты и расстояние")
+System_Ext(pay, "Платёжный шлюз", "Резервирование суммы")
+
+RelIndex(1, client, mobile, "Указывает точки А и Б, выбирает класс")
+RelIndex(2, mobile, api, "POST /rides", "JSON/HTTPS")
+RelIndex(3, api, pricer, "Запрашивает стоимость", "JSON/HTTPS")
+RelIndex(4, pricer, maps, "Запрашивает маршрут", "HTTPS")
+RelIndex(5, api, db, "Проверяет статус клиента")
+RelIndex(6, api, matcher, "Передаёт заказ на подбор водителя", "JSON/HTTPS")
+RelIndex(7, matcher, db, "Ищет свободных водителей в радиусе 5 км")
+RelIndex(8, matcher, db, "Создаёт предложение водителю")
+RelIndex(9, api, pay, "Резервирует сумму", "HTTPS")
+RelIndex(10, api, bus, "Публикует RideCreated", "AMQP")
+RelIndex(11, bus, worker, "Доставляет событие")
+RelIndex(12, worker, db, "Ставит таймаут 30 секунд")
+RelIndex(13, api, mobile, "Возвращает стоимость и время подачи", "JSON/HTTPS")
+RelIndex(14, mobile, client, "Показывает стоимость и время подачи")
+
+SHOW_LEGEND()
+
+@enduml
